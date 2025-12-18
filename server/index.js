@@ -36,17 +36,7 @@ setInterval(() => {
 }, 60 * 1000);
 
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-    'http://localhost:8080',
-    'http://127.0.0.1:5500',
-    'http://mytest.local:8080',
-    'http://mytest.local:5173',
-    'https://global-local.transak.com:5005',
-    'https://5173-firebase-test-google-ssogit-1766051641848.cluster-y3k7ko3fang56qzieg3trwgyfg.cloudworkstations.dev',
-    'https://onetaplogin-abacb--test-82rz2o6e.web.app'
-  ],
+  origin: true,
   methods: ['GET', 'POST', 'OPTIONS'],
 }));
 app.options('*', cors());
