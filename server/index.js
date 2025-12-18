@@ -18,8 +18,6 @@ const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 // Callback URI for the popup flow - must be registered in Google Console
 const CALLBACK_URI = process.env.GOOGLE_CALLBACK_URI || `http://localhost:${PORT}/auth/google/callback`;
-// For @react-oauth/google auth-code flow (kept for backward compatibility)
-const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || 'postmessage';
 
 // In-memory store for auth results keyed by state (use Redis in production)
 const authStore = new Map();
@@ -255,80 +253,6 @@ function popupClosePage(message, success) {
 </html>
   `.trim();
 }
-
-// ============================================================
-// LEGACY: Direct code exchange (for @react-oauth/google flow)
-// ============================================================
-
-app.post('/auth/google/exchange', async (req, res) => {
-  const { code } = req.body;
-
-  if (!code) {
-    return res.status(400).json({ error: 'Missing authorization code' });
-  }
-
-  if (!CLIENT_ID || !CLIENT_SECRET) {
-    return res.status(500).json({ error: 'Missing GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET' });
-  }
-
-  try {
-    const params = new URLSearchParams({
-      code,
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
-      redirect_uri: REDIRECT_URI,
-      grant_type: 'authorization_code',
-    });
-
-    // Exchange auth code for tokens
-    const { data: tokenData } = await axios.post(
-      'https://oauth2.googleapis.com/token',
-      params.toString(),
-      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
-    );
-
-    // Verify the ID token and get user info
-    let userInfo = null;
-    if (tokenData.id_token) {
-      const { data: verifiedToken } = await axios.get(
-        `https://oauth2.googleapis.com/tokeninfo?id_token=${tokenData.id_token}`,
-      );
-
-      // Verify the token was issued for our client
-      if (verifiedToken.aud !== CLIENT_ID) {
-        return res.status(401).json({ error: 'Token was not issued for this application' });
-      }
-
-      userInfo = {
-        sub: verifiedToken.sub,           // Unique Google user ID
-        email: verifiedToken.email,
-        email_verified: verifiedToken.email_verified === 'true',
-        name: verifiedToken.name,
-        picture: verifiedToken.picture,
-        given_name: verifiedToken.given_name,
-        family_name: verifiedToken.family_name,
-        locale: verifiedToken.locale,
-        iat: verifiedToken.iat,           // Issued at
-        exp: verifiedToken.exp,           // Expiration
-      };
-    }
-
-    res.json({
-      token_type: tokenData.token_type,
-      access_token: tokenData.access_token,
-      expires_in: tokenData.expires_in,
-      refresh_token: tokenData.refresh_token,
-      id_token: tokenData.id_token,
-      scope: tokenData.scope,
-      user: userInfo,
-      verified: !!userInfo,
-    });
-  } catch (error) {
-    const status = error?.response?.status || 500;
-    const message = error?.response?.data || error.message || 'Token exchange failed';
-    res.status(status).json({ error: message });
-  }
-});
 
 app.listen(PORT, () => {
   console.log(`Auth exchange server running on http://localhost:${PORT}`);
