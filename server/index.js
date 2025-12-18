@@ -39,7 +39,6 @@ app.use(cors({
   origin: true,
   methods: ['GET', 'POST', 'OPTIONS'],
 }));
-app.options('*', cors());
 
 app.use(express.json());
 
