@@ -44,9 +44,13 @@ app.use(cors({
     'http://mytest.local:8080',
     'http://mytest.local:5173',
     'https://global-local.transak.com:5005',
+    'https://5173-firebase-test-google-ssogit-1766051641848.cluster-y3k7ko3fang56qzieg3trwgyfg.cloudworkstations.dev',
+    'https://onetaplogin-abacb--test-82rz2o6e.web.app'
   ],
   methods: ['GET', 'POST', 'OPTIONS'],
 }));
+app.options('*', cors());
+
 app.use(express.json());
 
 app.get('/health', (_req, res) => {
