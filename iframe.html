@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%; background-color: #1c1f24">
+
+<head>
+    <title>Transak iFrame Test</title>
+    <meta name="viewport" content="width=device-width">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        .iframe-wrapper {
+            width: 500px;
+            height: 80dvh;
+        }
+
+        @media (max-width: 768px) {
+            .iframe-wrapper {
+                width: 100%;
+                height: calc(100dvh - 20px);
+            }
+        }
+    </style>
+</head>
+
+<body style="margin:0; padding:10px; height: 100%; display: grid">
+    <div class="iframe-wrapper"
+        style="position: relative;  margin: auto; box-shadow: 0 0 15px #db6014; border-radius: 15px; overflow: hidden">
+        <!-- <iframe id="transak-iframe" src="https://codesandbox.io/signin?continue=/dashboard/recent"
+      allow="camera;microphone;payment" style="height: 100%; width: 100%; border: none">
+    </iframe> -->
+        <iframe id="transak-iframe" src="http://localhost:5173"
+            allow="camera;microphone;payment;identity-credentials-get *"
+            style="height: 100%; width: 100%; border: none">
+        </iframe>
+    </div>
+
+</body>
+
+</html>
